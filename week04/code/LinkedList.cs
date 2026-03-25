@@ -1,4 +1,6 @@
 using System.Collections;
+using System.Globalization;
+using System.Transactions;
 
 public class LinkedList : IEnumerable<int>
 {
@@ -32,7 +34,18 @@ public class LinkedList : IEnumerable<int>
     /// </summary>
     public void InsertTail(int value)
     {
-        // TODO Problem 1
+        Node newNode = new(value);
+        if (_tail is null)
+        {
+            _head = newNode;
+            _tail = newNode;
+        }
+        else
+        {
+            newNode.Prev = _tail; 
+            _tail.Next = newNode; 
+            _tail = newNode; 
+        }
     }
 
 
@@ -64,7 +77,17 @@ public class LinkedList : IEnumerable<int>
     /// </summary>
     public void RemoveTail()
     {
-        // TODO Problem 2
+        if ( _head == _tail)
+        {
+            _head = null;
+            _tail = null;
+        }
+
+        else if (_tail is not null)
+        {
+            _tail.Prev!.Next = null;
+            _tail = _tail.Prev;
+        }
     }
 
     /// <summary>
@@ -108,7 +131,45 @@ public class LinkedList : IEnumerable<int>
     /// </summary>
     public void Remove(int value)
     {
-        // TODO Problem 3
+        
+        if (_head == null)
+            return;
+
+        
+        while (_head != null && _head.Data == value)
+        {
+            RemoveHead();
+        }
+
+        Node? current = _head;
+
+        
+        while (current != null)
+        {
+            Node? next = current.Next;
+            if (next != null && next.Data == value)
+            {
+                
+                if (current.Next == _tail)
+                {
+                    RemoveTail();
+                }
+                else
+                {                   
+                    current.Next = next.Next;
+
+                    if (next.Next != null)
+                    {
+                        next.Next.Prev = current;
+                    }
+                }
+                return;
+            }
+            else
+            {
+                current = current.Next;
+            }
+        }
     }
 
     /// <summary>
@@ -116,7 +177,16 @@ public class LinkedList : IEnumerable<int>
     /// </summary>
     public void Replace(int oldValue, int newValue)
     {
-        // TODO Problem 4
+        Node? current = _head;
+
+        while (current != null)
+        {
+            if (current.Data == oldValue)
+            {
+                current.Data =  newValue;
+            }
+            current = current.Next;
+        }
     }
 
     /// <summary>
@@ -146,8 +216,19 @@ public class LinkedList : IEnumerable<int>
     /// </summary>
     public IEnumerable Reverse()
     {
-        // TODO Problem 5
-        yield return 0; // replace this line with the correct yield return statement(s)
+        var stack = new Stack<int>();
+        var curr = _head; 
+
+        while (curr  != null)
+        {
+            stack.Push(curr.Data); 
+            curr = curr.Next; 
+        }
+
+        while (stack.Count >0)
+        {
+            yield return stack.Pop();
+        }
     }
 
     public override string ToString()
